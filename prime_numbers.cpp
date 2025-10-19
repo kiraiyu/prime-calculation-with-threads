@@ -5,6 +5,9 @@
 // Usage: ./prime_numbers <limit>
 // Example: ./prime_numbers 50
 
+//contributors :3 : 
+// Daniel Le and Keana De Padua
+
 
 #include <algorithm>
 #include <cctype>
