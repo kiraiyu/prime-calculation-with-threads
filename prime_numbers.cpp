@@ -5,7 +5,7 @@
 // Usage: ./prime_numbers <limit>
 // Example: ./prime_numbers 50
 
-//contributors :3 : 
+// contributors :3 : 
 // Daniel Le and Keana De Padua
 
 
@@ -20,6 +20,11 @@
 #include <vector>
 #include <limits>
 
+/** 
+ *  Determines whether a number is prime or not
+ *  @param longlongint Number to be checked
+ *  @return True if prime, false if not prime
+ */
 static bool isPrime(long long n) {
     if (n < 2) return false;
     if (n == 2) return true;
@@ -36,7 +41,15 @@ struct Range {
     long long end;   // inclusive
 };
 
-// worker: compute primes in [range.start, range.end], write both to local vector and a temp file
+/** 
+ *  Computes primes in [range.start, range.end]
+ *  Write both to local vector and a temp file
+ *  @param unsignedint Worker Id
+ *  @param Range Range from starting to end point for worker to work on
+ *  @param vector Local vector for output to be stored
+ *  @param string Name of file where output will be stored
+ *  @return Nothing
+*/
 static void workerTask(unsigned int workerId,
                        Range range,
                        std::vector<long long>& localOut,
@@ -65,9 +78,13 @@ static void workerTask(unsigned int workerId,
     }
 }
 
+/**
+ *  Strictly parse a non-negative integer that fits into long long
+ *  Reject leading +/-, spaces inside, and non-digits
+ *  @param char* Pointer to beginning of string we want to parse
+ *  @param longlong Where we want the int to be stored
+ */
 static bool parseLimit(const char* s, long long& out) {
-    // Strictly parse a non-negative integer that fits into long long
-    // Reject leading +/-, spaces inside, and non-digits.
     std::string str(s);
     if (str.empty()) return false;
     for (char c : str) if (!std::isdigit(static_cast<unsigned char>(c))) return false;
@@ -80,7 +97,7 @@ static bool parseLimit(const char* s, long long& out) {
 }
 
 int main(int argc, char* argv[]) {
-    // 1) Parse CLI
+    // Parse CLI
     if (argc != 2) {
         std::cerr << "Usage: " << argv[0] << " <limit>\n";
         std::cerr << "Example: " << argv[0] << " 50\n";
@@ -122,11 +139,12 @@ int main(int argc, char* argv[]) {
         ranges.push_back({start, end});
     }
 
-    // launch threads
+    // Launch threads
     std::vector<std::thread> threads;
     std::vector<std::vector<long long>> locals(numThreads);
     std::vector<std::string> tempFiles(numThreads);
 
+    // Creating tempFiles for each thread
     for (unsigned int i = 0; i < numThreads; ++i) {
         std::ostringstream oss;
         oss << "primes_thread_" << (i + 1) << ".txt";
@@ -142,14 +160,16 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    // Create threads
     threads.reserve(numThreads);
     for (unsigned int i = 0; i < numThreads; ++i) {
         threads.emplace_back(workerTask, i, ranges[i], std::ref(locals[i]), std::ref(tempFiles[i]));
     }
 
+    // Join all threads
     for (auto& t : threads) t.join();
 
-    // merge from files (delayed merge). read the temp files (as required),
+    //  Merge from files (delayed merge). Read the temp files (as required),
     //    but also append from locals as a fallback if a file was missing.
     std::cout << "Merging results...\n";
     std::vector<long long> all;
@@ -174,7 +194,7 @@ int main(int argc, char* argv[]) {
     std::sort(all.begin(), all.end());
     all.erase(std::unique(all.begin(), all.end()), all.end());
 
-    // pretty final output
+    // Pretty final output
     if (limit < 2 || all.empty()) {
         std::cout << "No primes <= " << limit << ".\n";
         return 0;
