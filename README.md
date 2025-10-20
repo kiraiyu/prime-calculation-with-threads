@@ -3,7 +3,7 @@ This project leverages multithreading for concurrent prime number calculation, a
 
 # Data input with command-line argument:
 The program should accept a single command-line argument: an integer limit, which specifies the upper bound for prime number calculation. Example: If the user runs the program with the input 50, the program should output all prime numbers from 1 to 50. Example usage: ./prime_numbers 50 
-See code sample https://www.geeksforgeeks.org/command-line-arguments-in-cpp/Links to an external site. 
+See code sample https://www.geeksforgeeks.org/command-line-arguments-in-cpp/ (Links to an external site). 
 
 # Thread Creation:
 The program must create multiple threads to divide the prime number calculation.
